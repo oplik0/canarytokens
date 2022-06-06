@@ -88,7 +88,7 @@ def _generateDevices():
     if not keySeed:
         print('Required setting WG_PRIVATE_KEY_SEED not defined in a *.env file')
         log.error('Required setting WG_PRIVATE_KEY_SEED not defined in a *.env file')
-        exit()
+        return []
     keyN = 1000
     if settings.WG_PRIVATE_KEY_N:
         keyN = int(settings.WG_PRIVATE_KEY_N)
