@@ -37,10 +37,15 @@ class WebhookOutputChannel(OutputChannel):
     def do_send_alert(self, input_channel=None, canarydrop=None, **kwargs):
 
         slack = "https://hooks.slack.com"
+        discord = "https://discord.com/api/webhooks/"
 
         try:
             if (slack in canarydrop['alert_webhook_url']):
                 payload = input_channel.format_slack_canaryalert(
+                                            canarydrop=canarydrop,
+                                            **kwargs)
+            elif (discord in canarydrop['alert_webhook_url']):
+                payload = input_channel.format_discord_canaryalert(
                                             canarydrop=canarydrop,
                                             **kwargs)
             else:

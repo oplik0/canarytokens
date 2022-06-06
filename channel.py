@@ -55,7 +55,7 @@ class InputChannel(Channel):
 
         return payload
 
-    def format_slack_canaryalert(self,canarydrop=None, protocol=settings.PROTOCOL,
+    def format_slack_canaryalert(self, canarydrop=None, protocol=settings.PROTOCOL,
                                    host=settings.PUBLIC_DOMAIN, **kwargs):
         payload = {}
         fields = []
@@ -65,7 +65,7 @@ class InputChannel(Channel):
                       .format(protocol=protocol,
                               host=host,
                               token=canarydrop['canarytoken'],
-                              auth= canarydrop['auth'])
+                              auth=canarydrop['auth'])
         attachment = {
             'title':'Canarytoken Triggered\n',
             'title_link': manage_link,
@@ -78,6 +78,31 @@ class InputChannel(Channel):
         fields.append({'title':'Manage','value': manage_link})
         attachment['fields'] = fields
         payload['attachments'] = [attachment]
+        return payload
+
+    def format_discord_canaryalert(self, canarydrop=None, protocol=settings.PROTOCOL, host=settings.PUBLIC_DOMAIN, **kwargs):
+        payload = {}
+        fields = []
+        if not host or host == '':
+            host=settings.PUBLIC_IP
+        manage_link = '{protocol}://{host}/manage?token={token}&auth={auth}'\
+                      .format(protocol=protocol,
+                              host=host,
+                              token=canarydrop['canarytoken'],
+                              auth=canarydrop['auth'])
+        time = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S (UTC)")
+        footer = { 'text' : 'Manage your settings for this Canarydrop:\n {link}'.format(link=manage_link) },
+        embed = {
+            'title':'Canarytoken Triggered',
+            'url': manage_link,
+            'footer' : footer,
+            'timestamp': time
+        }
+        fields.append({'title':'Channel','value':self.name, 'inline': True})
+        fields.append({'title':'Time', 'value': time, 'inline': True})
+        fields.append({'title':'Memo', 'value': canarydrop.memo})
+        embed['fields'] = fields
+        payload['embed'] = embed
         return payload
 
     def format_canaryalert(self, canarydrop=None, protocol=settings.PROTOCOL,
